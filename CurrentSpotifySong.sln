@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebService", "WebService", "{B283801B-3BDF-4DEC-B64C-0A4D3D072E9D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrentSpotifySong.WebService", "Source\WebService\CurrentSpotifySong.WebService.csproj", "{CC492BB1-EB36-49D3-A010-1AE504202E18}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{4CF71B77-BEC1-4F04-8B47-6E00C43B14BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrentSpotifySong.Infrastructure", "Source\Infrastructure\CurrentSpotifySong.Infrastructure\CurrentSpotifySong.Infrastructure.csproj", "{143604C3-CED0-46A6-8B2B-30B919C48A60}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adapters", "Adapters", "{60404DD5-3776-471C-9726-085E0F3F4F05}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CurrentSpotifySong.Adapters", "Source\Adapters\CurrentSpotifySong.Adapters\CurrentSpotifySong.Adapters.csproj", "{F2B93B18-56AF-4991-ACFE-894E69C749F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CC492BB1-EB36-49D3-A010-1AE504202E18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC492BB1-EB36-49D3-A010-1AE504202E18}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC492BB1-EB36-49D3-A010-1AE504202E18}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC492BB1-EB36-49D3-A010-1AE504202E18}.Release|Any CPU.Build.0 = Release|Any CPU
+		{143604C3-CED0-46A6-8B2B-30B919C48A60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{143604C3-CED0-46A6-8B2B-30B919C48A60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{143604C3-CED0-46A6-8B2B-30B919C48A60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{143604C3-CED0-46A6-8B2B-30B919C48A60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2B93B18-56AF-4991-ACFE-894E69C749F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2B93B18-56AF-4991-ACFE-894E69C749F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2B93B18-56AF-4991-ACFE-894E69C749F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2B93B18-56AF-4991-ACFE-894E69C749F0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CC492BB1-EB36-49D3-A010-1AE504202E18} = {B283801B-3BDF-4DEC-B64C-0A4D3D072E9D}
+		{143604C3-CED0-46A6-8B2B-30B919C48A60} = {4CF71B77-BEC1-4F04-8B47-6E00C43B14BC}
+		{F2B93B18-56AF-4991-ACFE-894E69C749F0} = {60404DD5-3776-471C-9726-085E0F3F4F05}
+	EndGlobalSection
+EndGlobal
