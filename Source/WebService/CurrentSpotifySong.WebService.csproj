@@ -2,9 +2,10 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
         <RootNamespace>Torty.Web.Apps.CurrentSpotifySong.WebService</RootNamespace>
         <LangVersion>default</LangVersion>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

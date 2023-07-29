@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>disable</Nullable>
+        <LangVersion>default</LangVersion>
+        <RootNamespace>Torty.Web.Apps.CurrentSpotifySong.Facades</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Data\CurrentSpotifySong.Data\CurrentSpotifySong.Data.csproj" />
+    </ItemGroup>
+
+</Project>

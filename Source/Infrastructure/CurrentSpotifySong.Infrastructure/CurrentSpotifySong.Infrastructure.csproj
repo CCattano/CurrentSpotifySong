@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>Torty.Web.Apps.CurrentSpotifySong.Infrastructure</RootNamespace>
         <LangVersion>default</LangVersion>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">

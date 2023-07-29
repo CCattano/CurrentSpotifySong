@@ -3,15 +3,16 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Torty.Web.Apps.CurrentSpotifySong.Adapters;
+using Torty.Web.Apps.CurrentSpotifySong.Data;
+using Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
-using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ResponseDtos;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions;
 using Torty.Web.Apps.CurrentSpotifySong.WebService.Middleware;
 using ApiType = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions.ConfigurationExtensions.ApiType;
 using AppSettings = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.SystemConstants.AppSettings;
+
 namespace Torty.Web.Apps.CurrentSpotifySong.WebService;
 
 public class Startup
@@ -44,6 +45,18 @@ public class Startup
 
         #endregion
 
+        #region FACADES
+
+        services.AddScoped<IUnauthenticatedUsersFacade, UnauthenticatedUsersFacade>();
+
+        #endregion
+
+        #region SERRVICES
+
+        services.AddDataService(Configuration.GetConnectionString(AppSettings.ConnStrings.MongoDb));
+
+        #endregion
+        
         #region Clients
 
         string spotifyClientId = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientId);

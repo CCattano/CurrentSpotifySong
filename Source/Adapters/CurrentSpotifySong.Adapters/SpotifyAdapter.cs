@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.Exceptions;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ObjectDtos;
@@ -17,8 +18,16 @@ public interface ISpotifyAdapter
 public class SpotifyAdapter : ISpotifyAdapter
 {
     private readonly ISpotifyClient _client;
+    private readonly IUnauthenticatedUsersFacade _facade;
 
-    public SpotifyAdapter(ISpotifyClient client) => _client = client;
+    public SpotifyAdapter(
+        ISpotifyClient client,
+        IUnauthenticatedUsersFacade facade
+    )
+    {
+        _client = client;
+        _facade = facade;
+    }
 
     public string GetAuthorizeUri()
     {

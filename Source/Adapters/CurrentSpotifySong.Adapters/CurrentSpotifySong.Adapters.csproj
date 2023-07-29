@@ -2,8 +2,9 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <EnablePreviewFeatures>True</EnablePreviewFeatures>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <LangVersion>default</LangVersion>
         <RootNamespace>Torty.Web.Apps.CurrentSpotifySong.Adapters</RootNamespace>
     </PropertyGroup>
@@ -13,6 +14,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Facades\CurrentSpotifySong.Facades\CurrentSpotifySong.Facades.csproj" />
       <ProjectReference Include="..\..\Infrastructure\CurrentSpotifySong.Infrastructure\CurrentSpotifySong.Infrastructure.csproj" />
     </ItemGroup>
 
