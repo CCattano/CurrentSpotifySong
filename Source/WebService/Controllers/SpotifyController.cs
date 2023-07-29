@@ -22,8 +22,8 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
     [HttpGet]
     public async Task<ActionResult> AccessCode(
         [FromQuery] string code,
-        [FromQuery] string? error,
-        [FromQuery] string? state // TODO: Process and validate state
+        [FromQuery] string error,
+        [FromQuery] string state // TODO: Process and validate state
     )
     {
         if (!string.IsNullOrWhiteSpace(error) || string.IsNullOrWhiteSpace(code))
