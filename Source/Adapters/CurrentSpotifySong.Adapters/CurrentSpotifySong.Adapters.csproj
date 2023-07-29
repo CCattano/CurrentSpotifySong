@@ -8,6 +8,10 @@
         <RootNamespace>Torty.Web.Apps.CurrentSpotifySong.Adapters</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>1701;1702;8600;8603</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
       <ProjectReference Include="..\..\Infrastructure\CurrentSpotifySong.Infrastructure\CurrentSpotifySong.Infrastructure.csproj" />
     </ItemGroup>

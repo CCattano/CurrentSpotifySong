@@ -7,15 +7,26 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Torty.Web.Apps.CurrentSpotifySong.Adapters;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ResponseDtos;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions;
 using Torty.Web.Apps.CurrentSpotifySong.WebService.Middleware;
-
+using ApiType = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions.ConfigurationExtensions.ApiType;
+using AppSettings = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.SystemConstants.AppSettings;
 namespace Torty.Web.Apps.CurrentSpotifySong.WebService;
 
 public class Startup
 {
-    public Startup(IConfiguration configuration) => Configuration = configuration;
+    public readonly IConfiguration Configuration;
+    
+    public Startup(IWebHostEnvironment env)
+    {
+        Configuration = new ConfigurationBuilder()
+            .SetBasePath(env.ContentRootPath)
+            .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
+            .AddEnvironmentVariables()
+            .Build();
+    }
 
-    public IConfiguration Configuration { get; }
 
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
@@ -35,7 +46,9 @@ public class Startup
 
         #region Clients
 
-        services.AddSpotifyClient();
+        string spotifyClientId = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientId);
+        string spotifyClientSecret = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientSecret);
+        services.AddSpotifyClient(spotifyClientId, spotifyClientSecret);
 
         #endregion
         
