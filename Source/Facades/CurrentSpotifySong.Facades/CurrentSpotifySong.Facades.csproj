@@ -10,7 +10,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\BusinessEntities\CurrentSpotifySong.BusinessEntities\CurrentSpotifySong.BusinessEntities.csproj" />
       <ProjectReference Include="..\..\Data\CurrentSpotifySong.Data\CurrentSpotifySong.Data.csproj" />
+      <ProjectReference Include="..\..\Infrastructure\CurrentSpotifySong.Infrastructure\CurrentSpotifySong.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

@@ -19,7 +19,7 @@ namespace Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient
 
 public interface ISpotifyClient
 {
-    string GetAuthorizeUri();
+    string GetAuthorizeUri(string state);
     Task<AccessTokenDto> GetAccessToken(string authorizationCode);
     Task<AccessTokenDto> RefreshAccessToken(string refreshToken);
     Task<CurrentlyPlayingResponseDto> GetCurrentlyPlayingTrack(string accessToken);
@@ -45,14 +45,14 @@ public class SpotifyClient : ISpotifyClient
         _clientSecret = clientSecret;
     }
 
-    public string GetAuthorizeUri()
+    public string GetAuthorizeUri(string state)
     {
         AuthorizeRequestDto requestDetails = new()
         {
             ClientId = _clientId,
             RedirectUri = _getRedirectUri(),
             ShowDialog = false,
-            // TODO: Implement State
+            State = state
         };
 
         IEnumerable<string> queryParams = JsonNode
@@ -70,7 +70,6 @@ public class SpotifyClient : ISpotifyClient
     {
         string authHeaderValue = GetAuthorizationHeader();
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
-        // _client.DefaultRequestHeaders.Add("Content-Type", "application/x-www-form-urlencoded");
 
         FormUrlEncodedContent httpRequestContent = GetHttpFormContent(new AccessTokenRequestDto()
         {
