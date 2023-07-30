@@ -40,7 +40,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
             string uri = await base.Adapter.GetAuthorizeUri(uuid);
             return RedirectPermanentPreserveMethod(uri);
         }
-        catch (UnauthenticatedUserNotFoundException _)
+        catch (UnauthenticatedUserNotFoundException)
         {
             string response = $"""
                 The unique code you provided was not recognized.
@@ -51,7 +51,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
             """;
             return Ok(response);
         }
-        catch (InvalidRegistrationTargetException _)
+        catch (InvalidRegistrationTargetException)
         {
             string response = $"""
                 Your registration link has expired.
@@ -88,7 +88,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
             """;
             return Ok(response);
         }
-        catch (UnauthenticatedUserNotFoundException ex)
+        catch (UnauthenticatedUserNotFoundException)
         {
             string response = $"""
                 The unique code you provided was not recognized.
@@ -104,19 +104,23 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
     [HttpGet]
     public async Task<ActionResult<string>> CurrentlyPlayingTrack([FromQuery] string id)
     {
-        if (string.IsNullOrWhiteSpace(id))
-            return Ok("You must provide your unique ID to fetch your currently playing information");
-        string currentTrackInfo = await base.Adapter.GetCurrentlyPlayingTrack(id);
-        return Ok(currentTrackInfo);
-    }
+        try
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return Ok("You must provide your unique ID to fetch your currently playing information");
+            string currentTrackInfo = await base.Adapter.GetCurrentlyPlayingTrack(id);
+            return Ok(currentTrackInfo);
+        }
+        catch (UserNotFoundException)
+        {
+            string response = $"""
+                The unique code you provided was not recognized.
 
-    [HttpPut]
-    public async Task<ActionResult> RefreshAccessCode([FromQuery] string userId)
-    {
-        if (string.IsNullOrWhiteSpace(userId))
-            return Ok("Must provide user identification");
-        
-        await base.Adapter.RefreshAccessToken(userId);
-        return Ok();
+                Go here to get started:
+
+                https://{_requestHost}/User/Register
+            """;
+            return Ok(response);
+        }
     }
 }

@@ -19,7 +19,9 @@ public interface IUserAdapter
     #region USERS
     
     Task<UserBE> CreateUser(UserBE user);
-    
+    Task<UserBE> GetUserById(string id);
+    Task<UserBE> UpdateUser(UserBE user);
+
     #endregion
 }
 
@@ -71,6 +73,20 @@ public class UserAdapter : BaseAdapter, IUserAdapter
     {
         UserBE newUser = await _usersFacade.Create(user);
         return newUser;
+    }
+
+    public async Task<UserBE> GetUserById(string id)
+    {
+        UserBE user = await _usersFacade.GetById(id);
+        if (user is null) throw new UserNotFoundException();
+        return user;
+    }
+
+    public async Task<UserBE> UpdateUser(UserBE user)
+    {
+        await GetUserById(user.Id);
+        UserBE updatedUser = await _usersFacade.Update(user);
+        return updatedUser;
     }
 
     #endregion
