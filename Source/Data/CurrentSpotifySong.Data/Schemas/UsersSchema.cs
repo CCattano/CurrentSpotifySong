@@ -5,12 +5,20 @@ using UsersRepository = Torty.Web.Apps.CurrentSpotifySong.Data.Repos.Users.Users
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Data.Schemas;
 
+/// <summary>
+/// An object representing a specific Database schema containing all
+/// Repositories that would write data to tables belonging to that schema
+/// </summary>
 public interface IUsersSchema
 {
+    /// <inheritdoc cref="IUnauthenticatedUsersRepo"/>
     IUnauthenticatedUsersRepo UnauthenticatedUsersRepo { get; }
+    
+    /// <inheritdoc cref="IUsersRepo"/>
     IUsersRepo UsersRepo { get; }
 }
 
+/// <inheritdoc cref="IUsersSchema"/>
 public class UsersSchema : BaseSchema, IUsersSchema
 {
     private IUnauthenticatedUsersRepo _unauthenticatedUsersRepo;

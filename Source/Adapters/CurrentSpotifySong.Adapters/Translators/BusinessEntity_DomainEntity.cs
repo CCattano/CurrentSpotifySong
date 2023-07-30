@@ -6,6 +6,9 @@ using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Adapters.Translators;
 
+/// <summary>
+/// Manifest of all translators that deal with translating business entities to domain entities and vice-versa
+/// </summary>
 public class BusinessEntity_DomainEntity: Profile
 {
     public BusinessEntity_DomainEntity()

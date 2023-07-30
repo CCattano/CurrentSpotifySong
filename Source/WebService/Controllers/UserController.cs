@@ -18,6 +18,18 @@ public class UserController : BaseController<IUserAdapter>
         _apiBaseUri = apiCtxUtil.BaseUri;
     }
 
+    /// <summary>
+    /// Register a new temporary user with the system
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This temp user will have 24 hours to authorize the app access to their Spotify information
+    ///     </para>
+    ///     <para>
+    ///         After 24 hours the user will have to restart the registration process
+    ///     </para>
+    /// </remarks>
+    /// <returns></returns>
     [HttpGet]
     [ResponseCache(NoStore = true, Duration = 0)]
     public async Task<ActionResult> Register()

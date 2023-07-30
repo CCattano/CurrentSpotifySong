@@ -5,26 +5,64 @@ using Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Adapters.Adapters;
 
+/// <summary>
+/// Adapter for handling all business logic related to working with User data
+/// </summary>
 public interface IUserAdapter
 {
     #region UNAUTHENTICATED USERS
 
+    /// <summary>
+    /// Create a new Unauthenticated User
+    /// </summary>
+    /// <returns></returns>
     Task<UnauthenticatedUserBE> CreateUnauthenticatedUser();
+    /// <summary>
+    /// Fetch a specific Unauthenticated User
+    /// </summary>
+    /// <param name="unauthenticatedUserId"></param>
+    /// <returns></returns>
     Task<UnauthenticatedUserBE> GetUnauthenticatedUserById(string unauthenticatedUserId);
+    /// <summary>
+    /// Delete a specific Unauthenticated User
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     Task DeleteUnauthenticatedUser(string id);
+    /// <summary>
+    /// Delete all Unauthenticated Users whose ExpireDateTime
+    /// is in the past compared to DateTime.Now
+    /// </summary>
+    /// <returns></returns>
     Task DeleteExpiredUnauthenticatedUsers();
     
     #endregion
 
     #region USERS
     
+    /// <summary>
+    /// Create a new User
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     Task<UserBE> CreateUser(UserBE user);
+    /// <summary>
+    /// Fetch a specific User
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     Task<UserBE> GetUserById(string id);
+    /// <summary>
+    /// Update a user with new information
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     Task<UserBE> UpdateUser(UserBE user);
 
     #endregion
 }
 
+/// <inheritdoc cref="IUserAdapter"/>
 public class UserAdapter : BaseAdapter, IUserAdapter
 {
     private readonly IUnauthenticatedUsersFacade _unauthenticatedUsersFacade;

@@ -4,14 +4,37 @@ using Torty.Web.Apps.CurrentSpotifySong.Data.Entities.Users;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Data.Repos.Users;
 
+/// <summary>
+/// A repository for interacting with the data contained in the users.UnauthenticatedUsers table
+/// </summary>
 public interface IUnauthenticatedUsersRepo : IBaseRepo
 {
+    /// <summary>
+    /// Create a new Unauthenticated User in the users.UnauthenticatedUsers table
+    /// </summary>
+    /// <returns></returns>
     Task<UnauthenticatedUser> Create();
+    /// <summary>
+    /// Fetch a specific Unauthenticated User from the users.UnauthenticatedUsers table
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     Task<UnauthenticatedUser> Get(string id);
+    /// <summary>
+    /// Delete a specific Unauthenticated User from the users.UnauthenticatedUsers table
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     Task Delete(string id);
+    /// <summary>
+    /// Delete all Unauthenticated Users from the users.UnauthenticatedUsers
+    /// table whose ExpireDateTime is in the past compared to DateTime.Now
+    /// </summary>
+    /// <returns></returns>
     Task DeleteExpiredUsers();
 }
 
+/// <inheritdoc cref="IUnauthenticatedUsersRepo"/>
 public class UnauthenticatedUsersRepo : BaseRepo<UnauthenticatedUser>, IUnauthenticatedUsersRepo
 {
     public static string CollectionName => "users.UnauthenticatedUsers";
