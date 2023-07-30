@@ -1,14 +1,12 @@
-﻿using MongoDB.Bson;
+﻿namespace Torty.Web.Apps.CurrentSpotifySong.BusinessEntities.User;
 
-namespace Torty.Web.Apps.CurrentSpotifySong.Data.Entities.Users;
-
-public record UnauthenticatedUser
+public record UnauthenticatedUserBE
 {
     /// <summary>
-    /// The unique MongoDb ID for this Unauthenticated user
+    /// The unique ID for this Unauthenticated user
     /// </summary>
-    public ObjectId Id;
-    
+    public string Id;
+
     /// <summary>
     /// How long this Unauthenticated User entry is valid for
     /// </summary>

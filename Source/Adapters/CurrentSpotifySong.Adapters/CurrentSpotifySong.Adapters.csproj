@@ -14,6 +14,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\BusinessEntities\CurrentSpotifySong.BusinessEntities\CurrentSpotifySong.BusinessEntities.csproj" />
+      <ProjectReference Include="..\..\BusinessModels\CurrentSpotifySong.BusinessModels\CurrentSpotifySong.BusinessModels.csproj" />
       <ProjectReference Include="..\..\Facades\CurrentSpotifySong.Facades\CurrentSpotifySong.Facades.csproj" />
       <ProjectReference Include="..\..\Infrastructure\CurrentSpotifySong.Infrastructure\CurrentSpotifySong.Infrastructure.csproj" />
     </ItemGroup>

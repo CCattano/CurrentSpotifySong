@@ -4,11 +4,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Torty.Web.Apps.CurrentSpotifySong.Adapters;
+using Torty.Web.Apps.CurrentSpotifySong.Adapters.Adapters;
+using Torty.Web.Apps.CurrentSpotifySong.Adapters.Translators;
 using Torty.Web.Apps.CurrentSpotifySong.Data;
 using Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions;
+using Torty.Web.Apps.CurrentSpotifySong.WebService.Controllers.BusinessModel_BusinessEntity;
 using Torty.Web.Apps.CurrentSpotifySong.WebService.Middleware;
 using ApiType = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions.ConfigurationExtensions.ApiType;
 using AppSettings = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.SystemConstants.AppSettings;
@@ -42,12 +44,14 @@ public class Startup
         #region ADAPTERS
 
         services.AddScoped<ISpotifyAdapter, SpotifyAdapter>();
+        services.AddScoped<IUserAdapter, UserAdapter>();
 
         #endregion
 
         #region FACADES
 
         services.AddScoped<IUnauthenticatedUsersFacade, UnauthenticatedUsersFacade>();
+        services.AddScoped<IUsersFacade, UsersFacade>();
 
         #endregion
 
@@ -57,18 +61,27 @@ public class Startup
 
         #endregion
         
-        #region Clients
+        #region CLIENTS
 
         string spotifyClientId = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientId);
         string spotifyClientSecret = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientSecret);
         services.AddSpotifyClient(spotifyClientId, spotifyClientSecret);
 
         #endregion
-        
+
+        #region EXTERNAL
+
+        services.AddAutoMapper(
+            typeof(BusinessEntity_DomainEntity),
+            typeof(BusinessModel_BusinessEntity)
+        );
+
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "CurrentSpotifySong", Version = "v1" });
         });
+
+        #endregion
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

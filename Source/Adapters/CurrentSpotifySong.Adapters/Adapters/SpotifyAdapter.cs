@@ -1,16 +1,16 @@
-﻿using System.Diagnostics;
-using Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
+﻿using Torty.Web.Apps.CurrentSpotifySong.Adapters.Exceptions.Spotify;
+using Torty.Web.Apps.CurrentSpotifySong.BusinessEntities.User;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.Exceptions;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ObjectDtos;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ResponseDtos;
 
-namespace Torty.Web.Apps.CurrentSpotifySong.Adapters;
+namespace Torty.Web.Apps.CurrentSpotifySong.Adapters.Adapters;
 
 public interface ISpotifyAdapter
 {
-    string GetAuthorizeUri();
-    Task GetAccessToken(string authorizationCode);
+    Task<string> GetAuthorizeUri(string unauthorizedUserId);
+    Task<UserBE> GenerateAccessTokenForUser(string authorizationCode, string state);
     Task<string> RefreshAccessToken(string userId);
     Task<string> GetCurrentlyPlayingTrack(string userId);
 }
@@ -18,27 +18,48 @@ public interface ISpotifyAdapter
 public class SpotifyAdapter : ISpotifyAdapter
 {
     private readonly ISpotifyClient _client;
-    private readonly IUnauthenticatedUsersFacade _facade;
+    private readonly IUserAdapter _userAdapter;
 
     public SpotifyAdapter(
         ISpotifyClient client,
-        IUnauthenticatedUsersFacade facade
+        IUserAdapter userAdapter
     )
     {
         _client = client;
-        _facade = facade;
+        _userAdapter = userAdapter;
     }
 
-    public string GetAuthorizeUri()
+    public async Task<string> GetAuthorizeUri(string unauthorizedUserId)
     {
-        string uri = _client.GetAuthorizeUri();
+        UnauthenticatedUserBE user = await _userAdapter.GetUnauthenticatedUserById(unauthorizedUserId);
+        if (DateTime.Now > user.ExpireDateTime)
+        {
+            await _userAdapter.DeleteExpiredUnauthenticatedUsers();
+            throw new InvalidRegistrationTargetException();
+        }
+        string uri = _client.GetAuthorizeUri(user.Id);
         return uri;
     }
 
-    public async Task GetAccessToken(string authorizationCode)
+    public async Task<UserBE> GenerateAccessTokenForUser(string authorizationCode, string state)
     {
+        // This method throws an exception if a unauthenticated user doesn't exist
+        // We don't actually need any information about the unauthenticated user
+        // As long as we get past this line without blowing up we're okay to continue
+        await _userAdapter.GetUnauthenticatedUserById(state);
         AccessTokenDto accessToken = await _client.GetAccessToken(authorizationCode);
-        Debugger.Break();
+        // After fetching an access token for this user they're a fully authenticated user in our system
+        // We need to create a row to represent them in our Users table
+        UserBE userToCreate = new()
+        {
+            AccessToken = accessToken.AccessToken,
+            RefreshToken = accessToken.RefreshToken
+        };
+        UserBE newUser = await _userAdapter.CreateUser(userToCreate);
+        // Now that they're no longer a temporary unauthenticated user
+        // let's remove their obsolete unauthenticated user row in our table
+        await _userAdapter.DeleteUnauthenticatedUser(state);
+        return newUser;
     }
 
     public async Task<string> GetCurrentlyPlayingTrack(string userId)
@@ -83,7 +104,7 @@ public class SpotifyAdapter : ISpotifyAdapter
         return response;
     }
 
-    private static string ParseSongTrack(TrackDto? track)
+    private static string ParseSongTrack(TrackDto track)
     {
         if (track is null) 
             return "Could not determine currently playing track. Please try again.";
@@ -100,7 +121,7 @@ public class SpotifyAdapter : ISpotifyAdapter
         return response;
     }
 
-    private static string ParseEpisodeTrack(EpisodeDto? episode)
+    private static string ParseEpisodeTrack(EpisodeDto episode)
     {
         if (episode is null) 
             return "Could not determine currently playing track. Please try again.";
