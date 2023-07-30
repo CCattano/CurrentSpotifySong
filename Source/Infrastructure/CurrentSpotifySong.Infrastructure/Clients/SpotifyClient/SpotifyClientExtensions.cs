@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.UtilityTypes;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient
 {
@@ -9,8 +9,8 @@ namespace Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient
         {
             services.AddHttpClient<ISpotifyClient, SpotifyClient>((httpClient, svcProvider) =>
             {
-                IHttpContextAccessor httpCtx = svcProvider.GetRequiredService<IHttpContextAccessor>();
-                return new SpotifyClient(httpClient, httpCtx, clientId, clientSecret);
+                ApiContextUtility apiCtxUtil = svcProvider.GetRequiredService<ApiContextUtility>();
+                return new SpotifyClient(httpClient, apiCtxUtil, clientId, clientSecret);
             });
         }
     }

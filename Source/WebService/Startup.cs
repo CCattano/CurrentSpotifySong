@@ -9,19 +9,21 @@ using Torty.Web.Apps.CurrentSpotifySong.Adapters.Adapters;
 using Torty.Web.Apps.CurrentSpotifySong.Adapters.Translators;
 using Torty.Web.Apps.CurrentSpotifySong.Data;
 using Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.UtilityTypes;
 using Torty.Web.Apps.CurrentSpotifySong.WebService.Controllers.BusinessModel_BusinessEntity;
 using Torty.Web.Apps.CurrentSpotifySong.WebService.Middleware;
-using ApiType = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions.ConfigurationExtensions.ApiType;
-using AppSettings = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.SystemConstants.AppSettings;
+using ConfigurationExtensions = Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Extensions.ConfigurationExtensions;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.WebService;
 
 public class Startup
 {
-    public readonly IConfiguration Configuration;
-    
+    private readonly IConfiguration Configuration;
+    private readonly bool IsProduction;
+
     public Startup(IWebHostEnvironment env)
     {
         Configuration = new ConfigurationBuilder()
@@ -29,6 +31,7 @@ public class Startup
             .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
             .AddEnvironmentVariables()
             .Build();
+        IsProduction = env.IsProduction();
     }
 
 
@@ -58,15 +61,30 @@ public class Startup
 
         #region SERRVICES
 
-        services.AddDataService(Configuration.GetConnectionString(AppSettings.ConnStrings.MongoDb));
+        services.AddDataService(Configuration.GetConnectionString(SystemConstants.AppSettings.ConnStrings.MongoDb));
 
         #endregion
         
         #region CLIENTS
 
-        string spotifyClientId = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientId);
-        string spotifyClientSecret = Configuration.GetApiConfig(ApiType.Spotify, AppSettings.APIs.Spotify.ClientSecret);
+        string spotifyClientId = Configuration.GetApiConfig(ConfigurationExtensions.ApiType.Spotify, SystemConstants.AppSettings.APIs.Spotify.ClientId);
+        string spotifyClientSecret = Configuration.GetApiConfig(ConfigurationExtensions.ApiType.Spotify, SystemConstants.AppSettings.APIs.Spotify.ClientSecret);
         services.AddSpotifyClient(spotifyClientId, spotifyClientSecret);
+
+        #endregion
+
+        #region UTILITIES
+
+        services.AddSingleton(provider =>
+        {
+            IHttpContextAccessor httpCtxAccessor = provider.GetRequiredService<IHttpContextAccessor>();
+            HttpRequest httpReq = httpCtxAccessor.HttpContext!.Request;
+            string protocolScheme = httpReq.Scheme;
+            string host = httpReq.Host.ToString();
+            string pathPrefix = IsProduction ? "/Production" : string.Empty;
+            string baseUri = $"{protocolScheme}://{host}{pathPrefix}";
+            return new ApiContextUtility(baseUri);
+        });
 
         #endregion
 
@@ -92,7 +110,7 @@ public class Startup
     {
         app.MapWhen(
             // When request path is /status/isalive.
-            path => path.Request.Path.Value?.ToLower() == "/status/isalive",
+            path => path.Request.Path.Value?.Contains("/status/isalive") ?? false,
             // Return this message.
             builder => builder.Run(async context =>
                 await context.Response.WriteAsync("CurrentSpotifySong Lambda is currently running."))
