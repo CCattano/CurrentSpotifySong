@@ -1,26 +1,28 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Torty.Web.Apps.CurrentSpotifySong.Adapters.Adapters;
 using Torty.Web.Apps.CurrentSpotifySong.Adapters.Exceptions.Spotify;
 using Torty.Web.Apps.CurrentSpotifySong.Adapters.Exceptions.User;
 using Torty.Web.Apps.CurrentSpotifySong.BusinessEntities.User;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.UtilityTypes;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.WebService.Controllers;
 
 [Route("[controller]/[action]")]
 public class SpotifyController : BaseController<ISpotifyAdapter>
 {
-    private readonly string _requestHost;
+    private readonly string _apiBaseUri;
+
     public SpotifyController(
-        ISpotifyAdapter adapter,
-        IHttpContextAccessor httpCtx
+        ApiContextUtility apiCtxUtil,
+        ISpotifyAdapter adapter
     ) : base(adapter)
     {
-        _requestHost = httpCtx.HttpContext!.Request.Host.ToString();
+        _apiBaseUri = apiCtxUtil.BaseUri;
     }
 
     [HttpGet]
+    [ResponseCache(NoStore = true, Duration = 0)]
     public async Task<ActionResult> Authorize([FromQuery] string uuid)
     {
         if (string.IsNullOrWhiteSpace(uuid))
@@ -30,7 +32,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
 
                 Go here to get started:
 
-                https://{_requestHost}/User/Register
+                {_apiBaseUri}/User/Register
             """;
             return Ok(response);
         }
@@ -47,7 +49,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
 
                 Go here to get started:
 
-                https://{_requestHost}/User/Register
+                {_apiBaseUri}/User/Register
             """;
             return Ok(response);
         }
@@ -58,13 +60,14 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
 
                 Go here to get started again:
 
-                https://{_requestHost}/User/Register
+                {_apiBaseUri}/User/Register
             """;
             return Ok(response);
         }
     }
 
     [HttpGet]
+    [ResponseCache(NoStore = true, Duration = 0)]
     public async Task<ActionResult<string>> AccessCode(
         [FromQuery] string code,
         [FromQuery] string error,
@@ -78,7 +81,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
         {
             UserBE user = await base.Adapter.GenerateAccessTokenForUser(code, state);
         
-            string bespokeUrl = $"https://{_requestHost}/Spotify/CurrentlyPlayingTrack?id={user.Id}";
+            string bespokeUrl = $"{_apiBaseUri}/Spotify/CurrentlyPlayingTrack?id={user.Id}";
             string response = $"""
                 You're all set!
                 
@@ -95,13 +98,14 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
 
                 Go here to get started:
 
-                https://{_requestHost}/User/Register
+                {_apiBaseUri}/User/Register
             """;
             return Ok(response);
         }
     }
     
     [HttpGet]
+    [ResponseCache(NoStore = true, Duration = 0)]
     public async Task<ActionResult<string>> CurrentlyPlayingTrack([FromQuery] string id)
     {
         try
@@ -118,7 +122,7 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
 
                 Go here to get started:
 
-                https://{_requestHost}/User/Register
+                {_apiBaseUri}/User/Register
             """;
             return Ok(response);
         }

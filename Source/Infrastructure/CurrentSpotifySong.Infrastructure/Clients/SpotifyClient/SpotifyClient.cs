@@ -9,11 +9,11 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.Exceptions;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ObjectDtos;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.RequestDtos;
 using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Types.ResponseDtos;
+using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.UtilityTypes;
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient;
 
@@ -28,21 +28,21 @@ public interface ISpotifyClient
 public class SpotifyClient : ISpotifyClient
 {
     private readonly HttpClient _client;
-    private readonly IHttpContextAccessor _httpCtx;
     private readonly string _clientId;
     private readonly string _clientSecret;
+    private readonly string _apiBaseUri;
 
     public SpotifyClient(
         HttpClient client,
-        IHttpContextAccessor httpCtx,
+        ApiContextUtility apiCtxUtil,
         string clientId,
         string clientSecret
     )
     {
         _client = client;
-        _httpCtx = httpCtx;
         _clientId = clientId;
         _clientSecret = clientSecret;
+        _apiBaseUri = apiCtxUtil.BaseUri;
     }
 
     public string GetAuthorizeUri(string state)
@@ -116,7 +116,7 @@ public class SpotifyClient : ISpotifyClient
         return response;
     }
 
-    private string _getRedirectUri() => $"https://{_httpCtx.HttpContext!.Request.Host}/Spotify/AccessCode";
+    private string _getRedirectUri() => $"{_apiBaseUri}/Spotify/AccessCode";
 
     private string GetAuthorizationHeader()
     {
