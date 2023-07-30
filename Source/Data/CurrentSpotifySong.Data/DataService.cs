@@ -5,9 +5,11 @@ namespace Torty.Web.Apps.CurrentSpotifySong.Data;
 
 public interface IDataService
 {
+    /// <inheritdoc cref="IUsersSchema"/>
     IUsersSchema Users { get; }
 }
 
+/// <inheritdoc cref="IDataService"/>
 public class DataService : BaseDataService, IDataService
 {
     private IUsersSchema _users;

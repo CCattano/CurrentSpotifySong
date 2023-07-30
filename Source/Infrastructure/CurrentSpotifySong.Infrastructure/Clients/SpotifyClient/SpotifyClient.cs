@@ -19,12 +19,36 @@ namespace Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient
 
 public interface ISpotifyClient
 {
+    /// <summary>
+    /// Returns the URI a user should use to be navigated to Spotify's
+    /// authorization UI to give this API access to their Spotify information
+    /// </summary>
+    /// <param name="state"></param>
+    /// <returns></returns>
     string GetAuthorizeUri(string state);
+    
+    /// <summary>
+    /// Generate an access token for a user who has
+    /// granted us access to their Spotify information
+    /// </summary>
+    /// <param name="authorizationCode"></param>
+    /// <returns></returns>
     Task<AccessTokenDto> GetAccessToken(string authorizationCode);
+    /// <summary>
+    /// Generate a new access token for a user whose current AccessToken has expired
+    /// </summary>
+    /// <param name="refreshToken"></param>
+    /// <returns></returns>
     Task<AccessTokenDto> RefreshAccessToken(string refreshToken);
+    /// <summary>
+    /// Fetch information about what a user is currently listening to
+    /// </summary>
+    /// <param name="accessToken"></param>
+    /// <returns></returns>
     Task<CurrentlyPlayingResponseDto> GetCurrentlyPlayingTrack(string accessToken);
 }
 
+/// <inheritdoc cref="ISpotifyClient"/>
 public class SpotifyClient : ISpotifyClient
 {
     private readonly HttpClient _client;
@@ -50,7 +74,7 @@ public class SpotifyClient : ISpotifyClient
         AuthorizeRequestDto requestDetails = new()
         {
             ClientId = _clientId,
-            RedirectUri = _getRedirectUri(),
+            RedirectUri = _GetRedirectUri(),
             ShowDialog = false,
             State = state
         };
@@ -68,13 +92,13 @@ public class SpotifyClient : ISpotifyClient
 
     public async Task<AccessTokenDto> GetAccessToken(string authorizationCode)
     {
-        string authHeaderValue = GetAuthorizationHeader();
+        string authHeaderValue = _GetAuthorizationHeader();
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
 
-        FormUrlEncodedContent httpRequestContent = GetHttpFormContent(new AccessTokenRequestDto()
+        FormUrlEncodedContent httpRequestContent = _GetHttpFormContent(new AccessTokenRequestDto()
         {
             Code = authorizationCode,
-            RedirectUri = _getRedirectUri(),
+            RedirectUri = _GetRedirectUri(),
         });
 
         HttpResponseMessage httpResponse = await _client.PostAsync(ApiEndpoints.Token, httpRequestContent);
@@ -86,10 +110,10 @@ public class SpotifyClient : ISpotifyClient
 
     public async Task<AccessTokenDto> RefreshAccessToken(string refreshToken)
     {
-        string authHeaderValue = GetAuthorizationHeader();
+        string authHeaderValue = _GetAuthorizationHeader();
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", authHeaderValue);
 
-        FormUrlEncodedContent httpRequestContent = GetHttpFormContent(new RefreshTokenRequestDto(refreshToken));
+        FormUrlEncodedContent httpRequestContent = _GetHttpFormContent(new RefreshTokenRequestDto(refreshToken));
 
         HttpResponseMessage httpResponse = await _client.PostAsync(ApiEndpoints.Token, httpRequestContent);
         AccessTokenDto response = null;
@@ -107,7 +131,7 @@ public class SpotifyClient : ISpotifyClient
         if (httpResponse.IsSuccessStatusCode)
         {
             string responseString = await httpResponse.Content.ReadAsStringAsync();
-            response = ProcessCurrentlyPlayingResponse(responseString);
+            response = _ProcessCurrentlyPlayingResponse(responseString);
         }
         else if (httpResponse.StatusCode == HttpStatusCode.Unauthorized)
         {
@@ -116,16 +140,16 @@ public class SpotifyClient : ISpotifyClient
         return response;
     }
 
-    private string _getRedirectUri() => $"{_apiBaseUri}/Spotify/AccessCode";
+    private string _GetRedirectUri() => $"{_apiBaseUri}/Spotify/AccessCode";
 
-    private string GetAuthorizationHeader()
+    private string _GetAuthorizationHeader()
     {
         string authHeaderValue =
             Convert.ToBase64String(Encoding.UTF8.GetBytes($"{_clientId}:{_clientSecret}"));
         return authHeaderValue;
     }
 
-    private static FormUrlEncodedContent GetHttpFormContent<T>(T objToConvertToForm)
+    private static FormUrlEncodedContent _GetHttpFormContent<T>(T objToConvertToForm)
     {
         Dictionary<string, string> formContent = JsonNode
             .Parse(
@@ -143,7 +167,7 @@ public class SpotifyClient : ISpotifyClient
         return httpRequestContent;
     }
 
-    private static CurrentlyPlayingResponseDto ProcessCurrentlyPlayingResponse(string responseString)
+    private static CurrentlyPlayingResponseDto _ProcessCurrentlyPlayingResponse(string responseString)
     {
         if (string.IsNullOrWhiteSpace(responseString)) return null;
         

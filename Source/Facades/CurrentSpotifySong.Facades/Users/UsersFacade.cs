@@ -7,11 +7,27 @@ namespace Torty.Web.Apps.CurrentSpotifySong.Facades.Users;
 
 public interface IUsersFacade
 {
+    /// <summary>
+    /// Create a new User
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     Task<UserBE> Create(UserBE user);
+    /// <summary>
+    /// Fetch a User by ID
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     Task<UserBE> GetById(string id);
+    /// <summary>
+    /// Update an existing User with new information
+    /// </summary>
+    /// <param name="user"></param>
+    /// <returns></returns>
     Task<UserBE> Update(UserBE user);
 }
 
+/// <inheritdoc cref="IUsersFacade"/>
 public class UsersFacade: BaseFacade, IUsersFacade
 {
     public UsersFacade(IDataService dataService, IMapper mapper) : base(dataService, mapper)

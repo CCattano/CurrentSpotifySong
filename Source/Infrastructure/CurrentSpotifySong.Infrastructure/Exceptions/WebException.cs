@@ -6,8 +6,8 @@ namespace Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Exceptions;
 
 public class WebException : Exception
 {
-    public HttpStatusCode ResponseCode;
-    public new string Message;
+    public readonly HttpStatusCode ResponseCode;
+    public new readonly string Message;
 
     public WebException(HttpStatusCode responseCode, string message)
     {

@@ -7,13 +7,33 @@ using Torty.Web.Apps.CurrentSpotifySong.Infrastructure.Clients.SpotifyClient.Typ
 
 namespace Torty.Web.Apps.CurrentSpotifySong.Adapters.Adapters;
 
+/// <summary>
+/// Adapter for handling all business logic related to working with Spotify data
+/// </summary>
 public interface ISpotifyAdapter
 {
+    /// <summary>
+    /// Fetch a URI that can be used to give this app access to a user's Spotify information
+    /// </summary>
+    /// <param name="unauthorizedUserId"></param>
+    /// <returns></returns>
     Task<string> GetAuthorizeUri(string unauthorizedUserId);
+    /// <summary>
+    /// Generate an access token for a user who has granted us permission to read the Spotify information
+    /// </summary>
+    /// <param name="authorizationCode"></param>
+    /// <param name="state"></param>
+    /// <returns></returns>
     Task<UserBE> GenerateAccessTokenForUser(string authorizationCode, string state);
+    /// <summary>
+    /// Fetch information about what a user is currently listening to on Spotify
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     Task<string> GetCurrentlyPlayingTrack(string userId);
 }
 
+/// <inheritdoc cref="ISpotifyAdapter"/>
 public class SpotifyAdapter : ISpotifyAdapter
 {
     private readonly ISpotifyClient _client;
@@ -31,9 +51,19 @@ public class SpotifyAdapter : ISpotifyAdapter
     public async Task<string> GetAuthorizeUri(string unauthorizedUserId)
     {
         UnauthenticatedUserBE user = await _userAdapter.GetUnauthenticatedUserById(unauthorizedUserId);
+        // We need to make sure this temp unauthenticated user hasn't expired
         if (DateTime.Now > user.ExpireDateTime)
         {
+            /*
+             * If the user has expired we'll fire off a request to prune our expired users
+             *
+             * Notice we don't delete the single expired user but go to prune all expired
+             *
+             * This has a added benefit of pruning out people who may have registered but
+             * will never come back to authorize so we may have never identified they expired
+             */
             await _userAdapter.DeleteExpiredUnauthenticatedUsers();
+            // Throw an ex to our upstream handler notifying them we can't proceed b/c the temp user was expired
             throw new InvalidRegistrationTargetException();
         }
         string uri = _client.GetAuthorizeUri(user.Id);
@@ -73,6 +103,16 @@ public class SpotifyAdapter : ISpotifyAdapter
         {
             // If our token has expired we'll attempt to refresh the token
             AccessTokenDto newAccessToken = await _client.RefreshAccessToken(user.RefreshToken);
+            /*
+             * According to the Spotify docs a new RefreshToken can, "sometimes"
+             * come back when making a request to refresh an access token
+             *
+             * So we'll check if our response contains a RefreshToken
+             * it will be null if they did not give us a new one
+             *
+             * If it is null we'll continue to keep the one we already have
+             * If it is not null we'll add it to our data payload so it gets updated on our user
+             */
             string refreshToken = string.IsNullOrWhiteSpace(newAccessToken.RefreshToken)
                 ? user.RefreshToken
                 : newAccessToken.RefreshToken;
@@ -82,10 +122,11 @@ public class SpotifyAdapter : ISpotifyAdapter
                 RefreshToken = refreshToken
             };
             UserBE updateUser = await _userAdapter.UpdateUser(newUserDetails);
-            // Then we'll try to make our request one more time
+            // Now we'll try to make our request one more time with our new AccessToken
             string currentTrackInfo = await _GetCurrentlyPlayingTrack(updateUser.AccessToken);
             return currentTrackInfo; 
             // We won't catch any exceptions and will let them bubble at this point
+            // If something goes wrong again it's not going to be for access token reasons
         }
     }
 
