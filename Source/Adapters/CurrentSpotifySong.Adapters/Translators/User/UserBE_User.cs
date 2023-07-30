@@ -41,7 +41,8 @@ public class UserBE_User: BaseTranslator<UserBE, Data.Entities.Users.User>
         {
             Id = string.IsNullOrWhiteSpace(source.Id) ? ObjectId.Empty : new ObjectId(source.Id),
             AccessToken = source.AccessToken,
-            RefreshToken = source.RefreshToken
+            RefreshToken = source.RefreshToken,
+            LastAccessedDateTime = DateTime.Now
         };
         return result;
     }

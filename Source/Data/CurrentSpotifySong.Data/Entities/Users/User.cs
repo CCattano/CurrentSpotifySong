@@ -20,4 +20,17 @@ public record User
     /// acquire a new AccessToken when the current one expired
     /// </summary>
     public string RefreshToken;
+
+    /// <summary>
+    /// The DateTime the user last accessed their Spotify Information
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This is not exposed beyond the Domain layer
+    ///     </para>
+    ///     <para>
+    ///         This is retained purely for administrative purposes
+    ///     </para>
+    /// </remarks>
+    public DateTime LastAccessedDateTime;
 }

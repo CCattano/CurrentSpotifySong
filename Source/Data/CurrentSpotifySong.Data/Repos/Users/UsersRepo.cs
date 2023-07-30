@@ -56,7 +56,8 @@ public class UsersRepo : BaseRepo<User>, IUsersRepo
     public async Task<User> Update(User user)
     {
         FilterDefinition<User> query = Builders<User>.Filter.Eq(nameof(User.Id), user.Id);
-        User updatedUser = await base.Collection.FindOneAndReplaceAsync(query, user);
+        FindOneAndReplaceOptions<User> options = new() { ReturnDocument = ReturnDocument.After };
+        User updatedUser = await base.Collection.FindOneAndReplaceAsync(query, user, options);
         return updatedUser;
     }
 }

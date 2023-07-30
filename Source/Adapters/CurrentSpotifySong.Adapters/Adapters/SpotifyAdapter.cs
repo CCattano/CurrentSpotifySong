@@ -94,6 +94,8 @@ public class SpotifyAdapter : ISpotifyAdapter
     public async Task<string> GetCurrentlyPlayingTrack(string userId)
     {
         UserBE user = await _userAdapter.GetUserById(userId);
+        // Calling update to bump the LastAccessedDateTime for this user
+        await _userAdapter.UpdateUser(user);
         try
         {
             string currentTrackInfo = await _GetCurrentlyPlayingTrack(user.AccessToken);
