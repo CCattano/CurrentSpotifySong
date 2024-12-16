@@ -104,7 +104,16 @@ public class SpotifyAdapter : ISpotifyAdapter
         catch (BadOrExpiredTokenException)
         {
             // If our token has expired we'll attempt to refresh the token
-            AccessTokenDto newAccessToken = await _client.RefreshAccessToken(user.RefreshToken);
+            AccessTokenDto newAccessToken;
+            try
+            { 
+                newAccessToken = await _client.RefreshAccessToken(user.RefreshToken);
+            }
+            catch (CannotRefreshAccessTokenException)
+            {
+                return "Could not refresh access to the Spotify API. Message Torty to look into it.";
+            }
+
             /*
              * According to the Spotify docs a new RefreshToken can, "sometimes"
              * come back when making a request to refresh an access token

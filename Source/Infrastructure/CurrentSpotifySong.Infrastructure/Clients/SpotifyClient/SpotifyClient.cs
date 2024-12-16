@@ -118,7 +118,25 @@ public class SpotifyClient : ISpotifyClient
         HttpResponseMessage httpResponse = await _client.PostAsync(ApiEndpoints.Token, httpRequestContent);
         AccessTokenDto response = null;
         if (httpResponse.IsSuccessStatusCode)
+        {
             response = await httpResponse.Content.ReadFromJsonAsync<AccessTokenDto>();
+        }
+        else
+        {
+            Console.WriteLine($"Could not refresh AccessToken for RefreshToken: {refreshToken}");
+            try
+            {
+                string errResp = await httpResponse.Content.ReadAsStringAsync();
+                Console.WriteLine($"Received the following error response: {errResp}");
+            }
+            catch
+            {
+                Console.WriteLine("Could not read error response received from Spotify API.");
+            }
+
+            throw new CannotRefreshAccessTokenException();
+        }
+        
         return response;
     }
 

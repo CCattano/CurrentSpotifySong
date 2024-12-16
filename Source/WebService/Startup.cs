@@ -1,3 +1,5 @@
+using System;
+using System.Net;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -107,9 +109,14 @@ public class Startup
         app.MapWhen(
             // When request path is /status/isalive.
             path => path.Request.Path.Value == "/status/isalive",
-            // Return this message.
             builder => builder.Run(async context =>
-                await context.Response.WriteAsync("CurrentSpotifySong Lambda is currently running."))
+            {
+                const string response = "CurrentSpotifySong Lambda is currently running.";
+                Console.WriteLine(response);
+                context.Response.StatusCode = (int)HttpStatusCode.OK;
+                // Return this message.
+                await context.Response.WriteAsync(response);
+            })
         );
 
         if (env.IsDevelopment())
