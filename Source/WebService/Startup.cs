@@ -98,7 +98,7 @@ public class Startup
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "CurrentSpotifySong", Version = "v1" });
         });
         
-        services.AddAWSLambdaHosting(LambdaEventSource.HttpApi);
+        services.AddAWSLambdaHosting(LambdaEventSource.RestApi);
 
         #endregion
     }
