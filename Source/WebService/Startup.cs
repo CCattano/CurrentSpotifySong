@@ -81,6 +81,9 @@ public class Startup
             string protocolScheme = httpReq.Scheme;
             string host = httpReq.Host.ToString();
             string baseUri = $"{protocolScheme}://{host}";
+            bool isAwsApiGatewaySrc = host.ToLower().EndsWith("torty.software");
+            if (isAwsApiGatewaySrc)
+                baseUri += "/CurrentSpotifySong";
             return new ApiContextUtility(baseUri);
         });
 

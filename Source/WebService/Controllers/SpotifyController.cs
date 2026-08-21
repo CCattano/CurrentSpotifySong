@@ -145,11 +145,11 @@ public class SpotifyController : BaseController<ISpotifyAdapter>
                 
                 Use this unique URL to fetch information about what you're listening to on Spotify!
             
-                {bespokeUrl}
+                    {bespokeUrl}
                 
                 Or run the following command to add a new command to your chat bot that uses your unique url.
                 
-                Nightbot: !commands add !song -ul=everyone -cd=30 $(urlfetch {bespokeUrl})
+                    Nightbot: !commands add !song -ul=everyone -cd=30 $(urlfetch {bespokeUrl})
                 
                 If your chatbot of choice is not listed I can help you figure out what integration looks like.
             """;
